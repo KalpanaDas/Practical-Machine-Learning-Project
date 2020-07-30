@@ -44,7 +44,7 @@ Our outcome variable “classe” is an unordered factor variable. Thus, we can 
 
 ## Packages, Libraries and Seed
 
-```{r}
+```
 library(caret)
 library(randomForest)
 library(rpart) 
