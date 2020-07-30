@@ -77,6 +77,10 @@ myTesting <- training[-inTrain, ]
 dim(myTraining)
 dim(myTesting)
 ```
+```{r, echo = FALSE}
+dim(myTraining)
+dim(myTesting)
+```
 
 ## Cleaning the data
 The following transformations were used to clean the data.
@@ -104,6 +108,9 @@ myNZVvars <- names(myTraining) %in% c("new_window", "kurtosis_roll_belt", "kurto
 myTraining <- myTraining[!myNZVvars]
 dim(myTraining)
 ```
+```{r, echo = FALSE}
+dim(myTraining)
+```
 
 ```{r}
 # Transformation 2: Killing first column of Dataset - Removing first ID variable so that it does not interfer with ML Algorithms:
@@ -123,6 +130,9 @@ dim(trainingV3)
 myTraining <- trainingV3
 rm(trainingV3)
 ```
+```{r, echo = FALSE}
+dim(trainingV3)
+```
 
 Now let us do the exact same 3 transformations for myTesting and testing data sets.
 
@@ -134,6 +144,10 @@ testing <- testing[clean2]
 # To check the new N?? of observations
 dim(myTesting)
 # To check the new N?? of observations
+dim(testing)
+```
+```{r, echo = FALSE}
+dim(myTesting)
 dim(testing)
 ```
 
@@ -158,3 +172,56 @@ modFitA1 <- rpart(classe ~ ., data=myTraining, method="class")
 # To view the decision tree with fancy
 fancyRpartPlot(modFitA1)
 ```
+```{r, echo = FALSE}
+fancyRpartPlot(modFitA1)
+```
+
+### Predicting
+
+```{r}
+predictionsA1 <- predict(modFitA1, myTesting, type = "class")
+# Using confusion Matrix to test results
+confusionMatrix(predictionsA1, myTesting$classe)
+```
+```{r, echo = FALSE}
+confusionMatrix(predictionsA1, myTesting$classe)
+```
+### Random Forests
+
+```{r}
+modFitB1 <- randomForest(classe ~. , data=myTraining)
+# Predicting in-sample error
+predictionsB1 <- predict(modFitB1, myTesting, type = "class")
+# Using confusion Matrix to test results
+confusionMatrix(predictionsB1, myTesting$classe)
+```
+```{r, echo = FALSE}
+confusionMatrix(predictionsB1, myTesting$classe)
+```
+## Generating Answer files 
+
+```{r}
+# Finally, using the provided Test Set out-of-sample error, for Random Forests we use the following formula, which yields a much better prediction in sample
+predictionsB2 <- predict(modFitB1, testing, type = "class")
+# Function to generate files with predictions to submit for assignment
+
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)}}
+pml_write_files(predictionsB2)
+```
+
+## Predicted answers for 20 different test cases
+This tells which classe the problem IDs belong to:
+
+Classe A: 2, 4, 5, 9, 10, 14, 17
+
+Classe B: 1, 3, 8, 11, 13, 18, 19, 20
+
+Classe C: 12
+
+Classe D: 7
+
+Classe E: 6, 15, 16
